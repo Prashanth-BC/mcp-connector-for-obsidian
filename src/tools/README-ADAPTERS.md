@@ -1,0 +1,1 @@
+This folder contains adapters for third-party plugins. The templater adapter attempts multiple strategies to support different Templater versions. The Dataview and Tasks adapters are included as well.

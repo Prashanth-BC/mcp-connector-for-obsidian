@@ -1,0 +1,31 @@
+node_modules/
+*.log
+.DS_Store
+dist/
+coverage/
+.nyc_output
+.env
+.vscode/settings.json
+# Local dev/support artifacts (not needed in repo)
+example_*.json
+test_*.json
+test_*.bat
+test_*.ps1
+verify_server.bat
+claude_init.json
+data.json
+dev-support/
+main.js
+mcp-server.js
+*.js.map
+*.tsbuildinfo
+Thumbs.db
+.idea/
+.tmp/
+.env.*
+*.local
+*.swp
+# Obsidian local workspace state (avoid committing user-specific layout)
+.obsidian/workspace.json
+.obsidian/workspace-mobile.json
+.obsidian/app.json

@@ -1,0 +1,11 @@
+
+{
+  "id": "obsidian-mcp-connector",
+  "name": "Obsidian MCP Connector",
+  "version": "0.2.0",
+  "minAppVersion": "1.2.0",
+  "description": "Unified connector exposing Obsidian vault tools & plugin APIs (Dataview) over MCP/HTTP.",
+  "author": "Prashanth Chamegowda",
+  "authorUrl": "",
+  "isDesktopOnly": true
+}

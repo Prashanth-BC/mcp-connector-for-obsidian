@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "obsidian-mcp-connector": {
+      "type": "http",
+      "url": "http://127.0.0.1:4123",
+      "description": "Access to Obsidian vault notes, search, and plugin data"
+    }
+  }
+}
