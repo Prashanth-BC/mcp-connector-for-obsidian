@@ -1,6 +1,6 @@
 
 {
-  "name": "obsidian-connector",
+  "name": "obsidian-mcp-connector",
   "version": "0.2.0",
   "main": "main.js",
   "license": "GPL-3.0-or-later",
