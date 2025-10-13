@@ -6,5 +6,6 @@
   "minAppVersion": "1.2.0",
   "description": "Unified connector exposing Obsidian vault tools & plugin APIs (Dataview) over MCP/HTTP.",
   "author": "Prashanth Bhagyalakshmi Chamegowda",
-  "authorUrl": "https://github.com/Prashanth-BC"
+  "authorUrl": "https://github.com/Prashanth-BC",
+  "isDesktopOnly": false
 }
