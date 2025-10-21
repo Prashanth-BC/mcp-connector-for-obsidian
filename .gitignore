@@ -6,6 +6,7 @@ coverage/
 .nyc_output
 .env
 .vscode/settings.json
+.claude/
 # Build output directories
 mcp-connector/
 main.js
