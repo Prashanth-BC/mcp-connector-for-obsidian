@@ -1,0 +1,6 @@
+{
+  "enabledMcpjsonServers": [
+    "obsidian-mcp-connector"
+  ],
+  "enableAllProjectMcpServers": true
+}

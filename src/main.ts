@@ -1,10 +1,16 @@
-import { App, Plugin } from "obsidian";
-import { McpServer } from "./mcp-server";
+import { App, Platform, Plugin } from "obsidian";
 import { PluginBridge } from "./plugin-bridge";
 import { DEFAULT_SETTINGS, ObsidianMcpSettingsTab } from "./settings";
+import { McpWebSocketTransport } from "./mcp-websocket";
+
+// Types for our transport interfaces
+interface McpTransport {
+  start(): Promise<void>;
+  stop(): void;
+}
 
 export default class ObsidianMcpBridge extends Plugin {
-  server?: McpServer;
+  transport?: McpTransport;
   bridge?: PluginBridge;
   settings: typeof DEFAULT_SETTINGS = DEFAULT_SETTINGS;
 
@@ -13,26 +19,32 @@ export default class ObsidianMcpBridge extends Plugin {
     await this.loadSettings();
 
     this.bridge = new PluginBridge(this.app, this);
-    
-    const serverOptions = { 
-      host: "127.0.0.1", 
-      port: this.settings.port,
-      authToken: this.settings.enableAuth ? this.settings.authToken : undefined
-    };
-    
-    this.server = new McpServer(this.bridge, serverOptions);
-    await this.server.start();
+
+    // Detect platform and load appropriate transport
+    const isMobile = Platform.isMobile;
+    console.log(`[obsidian-mcp-bridge] Platform: ${isMobile ? "Mobile" : "Desktop"}`);
+
+    try {
+      // Use WebSocket transport for both desktop and mobile
+      console.log(`[obsidian-mcp-bridge] Loading WebSocket transport for ${isMobile ? "mobile" : "desktop"}...`);
+      const wsUrl = this.settings.websocketUrl || "ws://127.0.0.1:4124/mcp";
+      this.transport = new McpWebSocketTransport(this.bridge, { url: wsUrl });
+      await this.transport.start();
+    } catch (error) {
+      console.error("[obsidian-mcp-bridge] Failed to start transport:", error);
+      // Continue loading plugin even if transport fails
+    }
 
     this.addSettingTab(new ObsidianMcpSettingsTab(this.app, this));
 
     this.register(() => {
-      this.server?.stop();
+      this.transport?.stop();
     });
   }
 
   onunload() {
     console.log("[obsidian-mcp-bridge] unloading...");
-    this.server?.stop();
+    this.transport?.stop();
   }
 
   async loadSettings() {

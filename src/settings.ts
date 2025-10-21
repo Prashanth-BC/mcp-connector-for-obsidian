@@ -1,15 +1,11 @@
 import { App, PluginSettingTab, Setting } from 'obsidian';
 
 export interface ObsidianMcpSettings {
-  port: number;
-  authToken: string;
-  enableAuth: boolean;
+  websocketUrl: string;
 }
 
 export const DEFAULT_SETTINGS: ObsidianMcpSettings = {
-  port: 4123,
-  authToken: "",
-  enableAuth: false,
+  websocketUrl: "ws://127.0.0.1:4124/mcp",
 };
 
 export class ObsidianMcpSettingsTab extends PluginSettingTab {
@@ -24,58 +20,63 @@ export class ObsidianMcpSettingsTab extends PluginSettingTab {
     const { containerEl } = this;
     containerEl.empty();
 
-    containerEl.createEl('h2', { text: 'Obsidian MCP Bridge Settings' });
+    containerEl.createEl('h2', { text: 'Obsidian MCP Connector Settings' });
 
-    new Setting(containerEl)
-      .setName('Server Port')
-      .setDesc('Port number for the local MCP HTTP server (default: 4123)')
-      .addText(text => text
-        .setPlaceholder('4123')
-        .setValue(String(this.plugin.settings?.port || 4123))
-        .onChange(async (value) => {
-          const port = parseInt(value) || 4123;
-          if (port > 0 && port <= 65535) {
-            this.plugin.settings.port = port;
-            await this.plugin.saveSettings();
-          }
-        }));
+    // Connection Status
+    const statusEl = containerEl.createDiv({ cls: 'mcp-status-container' });
+    const status = this.plugin.transport?.connectionStatus || 'disconnected';
+    const statusIcon = status === 'connected' ? '✅' : status === 'connecting' ? '🔄' : '❌';
+    const statusText = status === 'connected' ? 'Connected' : status === 'connecting' ? 'Connecting...' : 'Disconnected';
 
-    new Setting(containerEl)
-      .setName('Enable Authentication')
-      .setDesc('Require bearer token authentication for MCP connections')
-      .addToggle(toggle => toggle
-        .setValue(this.plugin.settings?.enableAuth || false)
-        .onChange(async (value) => {
-          this.plugin.settings.enableAuth = value;
-          await this.plugin.saveSettings();
-          this.display(); // Refresh to show/hide auth token field
-        }));
+    statusEl.createEl('p', {
+      text: `${statusIcon} Status: ${statusText}`,
+      cls: `mcp-status mcp-status-${status}`
+    });
 
-    if (this.plugin.settings?.enableAuth) {
-      new Setting(containerEl)
-        .setName('Authentication Token')
-        .setDesc('Bearer token that clients must provide (leave empty to auto-generate)')
-        .addText(text => text
-          .setPlaceholder('your-secret-token')
-          .setValue(this.plugin.settings?.authToken || '')
-          .onChange(async (value) => {
-            this.plugin.settings.authToken = value || this.generateToken();
-            await this.plugin.saveSettings();
-          }));
-
-      if (this.plugin.settings?.authToken) {
-        containerEl.createEl('p', { 
-          text: `Current token: ${this.plugin.settings.authToken}`,
-          cls: 'mod-warning'
-        });
-        containerEl.createEl('p', { 
-          text: 'Add this to your Claude Desktop config: "Authorization": "Bearer ' + this.plugin.settings.authToken + '"'
-        });
-      }
+    if (status === 'disconnected') {
+      statusEl.createEl('p', {
+        text: '⚠️  Bridge server not running. Start it with: node .obsidian/plugins/mcp-connector/mcp-http-ws-bridge.js',
+        cls: 'mod-warning'
+      });
     }
-  }
 
-  private generateToken(): string {
-    return 'obsidian-' + Math.random().toString(36).substring(2) + Date.now().toString(36);
+    containerEl.createEl('p', {
+      text: 'This plugin uses WebSocket to connect to a bridge server. The plugin will automatically reconnect if the connection is lost.'
+    });
+
+    new Setting(containerEl)
+      .setName('WebSocket Bridge URL')
+      .setDesc('WebSocket bridge URL (default: ws://127.0.0.1:4124/mcp)')
+      .addText(text => text
+        .setPlaceholder('ws://127.0.0.1:4124/mcp')
+        .setValue(this.plugin.settings?.websocketUrl || 'ws://127.0.0.1:4124/mcp')
+        .onChange(async (value) => {
+          this.plugin.settings.websocketUrl = value || 'ws://127.0.0.1:4124/mcp';
+          await this.plugin.saveSettings();
+        }));
+
+    containerEl.createEl('h3', { text: 'Quick Start' });
+
+    containerEl.createEl('p', {
+      text: '1. Start the bridge server: node .obsidian/plugins/mcp-connector/mcp-http-ws-bridge.js'
+    });
+
+    containerEl.createEl('p', {
+      text: '2. Reload this plugin (if already loaded)'
+    });
+
+    containerEl.createEl('p', {
+      text: '3. Connect your MCP client to: http://127.0.0.1:4125/mcp'
+    });
+
+    // Refresh button
+    new Setting(containerEl)
+      .setName('Refresh Status')
+      .setDesc('Manually check connection status')
+      .addButton(button => button
+        .setButtonText('Refresh')
+        .onClick(() => {
+          this.display();
+        }));
   }
 }

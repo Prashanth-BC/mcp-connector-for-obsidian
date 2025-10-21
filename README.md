@@ -1,142 +1,190 @@
 # Obsidian MCP Connector
 
-This repository provides an Obsidian plug### Claude Desktop / Other MCP Clients
-Configure a direct HTTP server entry pointing to: `http://127.0.0.1:4123/mcp` (or your configured port). No subprocess or extra wrapper is required.
+Connect your Obsidian vault to AI assistants and automation tools through the Model Context Protocol (MCP). This plugin enables seamless integration between your knowledge base and MCP-compatible clients like Claude Code.
 
-**Notes:**
-- Ensure the plugin is enabled first so the server is listening
-- Restart the client if it cached an older capability response
-- If you enable auth later, add the Bearer token header in the client's MCP config exposes a local Model Context Protocol (MCP) / HTTP connector. It discovers other loaded plugins (Dataview, Templater, Tasks) and registers bridge functions for them. It includes:
+## Why Use This Plugin?
 
-- Configurable port number for the local server
-- Adapters for Dataview and Tasks
-- Example Node.js CLI client
-- Unit test framework support
+- **AI-Powered Knowledge Management**: Let AI assistants read, search, and manage your notes
+- **Advanced Task Management**: Create, edit, and track tasks with rich metadata using natural language
+- **Dataview Integration**: Execute powerful queries to surface insights from your vault
+- **Cross-Platform**: Works on Windows, macOS, Linux, and Android (self-contained on device)
+- **Privacy-First**: Runs entirely on your local machine - no cloud services required
+- **Auto-Reconnection**: Robust connection handling with automatic recovery
 
-## Security
-- The plugin binds to `127.0.0.1` and **does not** listen on external interfaces.
-- No authentication is required for local requests as security is provided by network binding restrictions.
+## Key Features
 
-## How to build
-1. `npm ci`
-2. `npm run build`
-3. Place `manifest.json` and `main.js` in a new folder under your Obsidian vault's `.obsidian/plugins/obsidian-mcp-connector/`
-4. Reload Obsidian and enable the plugin.
+### Task Management
+- ✅ Full CRUD operations with Dataview metadata support
+- ✅ Priority levels, due dates, tags, and custom fields
+- ✅ Auto-generated unique task IDs for tracking
+- ✅ Recurring tasks and event scheduling
+- ✅ Smart search by text, priority, tags, and dates
+- ✅ Subtask management with proper indentation
 
-## Endpoints
-- `POST http://127.0.0.1:<port>/mcp` — send JSON-RPC requests (example: `{ "jsonrpc":"2.0","id":1,"method":"vault.listNotes" }`)
-- `GET  http://127.0.0.1:<port>/tools` — returns the list of available tools
+### Dataview Integration
+- ✅ Execute TABLE, LIST, and TASK queries
+- ✅ Access page metadata and inline fields
+- ✅ Complex filtering with WHERE/FROM/SORT clauses
+- ✅ Structured and markdown output formats
 
-The default port is `4123` but can be configured in the plugin settings.
+### Vault Operations
+- ✅ List, read, and search notes
+- ✅ File metadata access
+- ✅ Path-based organization
+- ✅ Full-text search capabilities
 
-## Example curl
+## How It Works
 
-```bash
-curl -X POST http://127.0.0.1:4123/mcp \
-  -H "Content-Type: application/json" \
-  -d '{"jsonrpc":"2.0","id":1,"method":"dataview.query","params":{"query":"TABLE file.name"}}'
+The plugin uses a **unified WebSocket architecture** that works across all platforms:
+
+```
+MCP Client (Claude Code) ←→ Bridge Server ←→ Obsidian Plugin ←→ Your Vault
+    (HTTP/MCP)                (WebSocket)        (Obsidian API)
 ```
 
+1. **Bridge Server** runs locally and translates between HTTP/MCP and WebSocket protocols
+2. **Obsidian Plugin** connects to the bridge and exposes vault operations as MCP tools
+3. **MCP Clients** like Claude Code can then interact with your vault through natural language
+
+**Supported Platforms:**
+- ✅ Windows, macOS, Linux (full desktop support)
+- ✅ Android (self-contained with Termux)
+- ⚠️ iOS (requires external bridge server)
+
+## Quick Start
+
+### 1. Install the Plugin
+
 ```bash
-curl -X POST http://127.0.0.1:4123/mcp -H "Content-Type: application/json" -d '{"jsonrpc":"2.0","id":1,"method":"vault.listNotes" }'
+# Build the plugin
+npm ci
+npm run build
+
+# Copy to your vault
+cp -r mcp-connector /path/to/vault/.obsidian/plugins/
 ```
+
+Enable the plugin in Obsidian Settings → Community plugins → MCP Connector
+
+### 2. Start the Bridge Server
+
+```bash
+# Linux/Mac
+.obsidian/plugins/mcp-connector/start-bridge.sh
+
+# Windows
+.obsidian\plugins\mcp-connector\start-bridge.cmd
+
+# Wait for: [WS Bridge] ✅ Obsidian plugin connected - Bridge is now READY
+```
+
+### 3. Connect Your MCP Client
+
+```bash
+# Claude Code
+claude mcp add --transport http obsidian http://127.0.0.1:4125/mcp
+
+# Or configure in .mcp.json
+{
+  "mcpServers": {
+    "obsidian": {
+      "url": "http://127.0.0.1:4125/mcp"
+    }
+  }
+}
+```
+
+### 4. Start Using It!
+
+Ask your AI assistant to:
+- "List all my tasks with high priority"
+- "Search my notes for references to machine learning"
+- "Create a task to review the project plan by Friday"
+- "Show me all notes in the Projects folder"
+
+## Use Cases
+
+### For Knowledge Workers
+- **AI-Assisted Research**: Let AI assistants help you explore and connect ideas across your vault
+- **Smart Task Management**: Create and organize tasks using natural language
+- **Automated Workflows**: Build automation scripts that interact with your notes
+
+### For Developers
+- **Project Documentation**: Query project notes and technical documentation programmatically
+- **Issue Tracking**: Manage development tasks with rich metadata
+- **Code Integration**: Connect your code with your knowledge base
+
+### For Students
+- **Study Management**: Track assignments, readings, and deadlines
+- **Research Organization**: Query and organize research notes efficiently
+- **Note Synthesis**: Let AI help you connect concepts across your notes
+
+## Documentation
+
+- **[Architecture](docs/ARCHITECTURE.md)** - Technical details and system design
+- **[Setup Guide](docs/SETUP.md)** - Installation and platform-specific configuration
+- **[Tool Reference](docs/TOOLS.md)** - Complete API documentation for all MCP tools
+- **[Troubleshooting](docs/TROUBLESHOOTING.md)** - Common issues and solutions
 
 ## Development
 
-This plugin is built using TypeScript and includes:
-- Source code in the `src/` directory
-- Unit tests in the `tests/` directory 
-- Build configuration with esbuild for fast compilation
-- TypeScript configuration for development
+### Building
+
+```bash
+# Install dependencies
+npm ci
+
+# Build once
+npm run build
+
+# Watch for changes
+npm run watch
+```
 
 ### Testing
-Run the test suite with:
+
 ```bash
 npm test
 ```
 
-### Building
-Build the plugin for development:
-```bash
-npm run build
-```
-
-Watch for changes during development:
-```bash
-npm run watch
-```
-
-## Settings UI & Port Configuration
-The plugin includes a Settings tab (Obsidian UI) where you can configure the server port number. The port setting is persisted in Obsidian's plugin data and will take effect when the plugin is reloaded.
-
-## MCP Client Configuration
-
-The HTTP MCP server starts automatically when the plugin is enabled in Obsidian. You do NOT need to run any additional process; HTTP is the only supported transport in this trimmed build.
-
-### How it works:
-1. **Obsidian plugin** starts an HTTP server (default port 4123) 
-2. **MCP clients** connect directly to the HTTP server
-3. **Plugin bridge** translates MCP protocol requests to Obsidian API calls
-
-### **For Claude Code (HTTP - Recommended)**
-Direct HTTP connection (no subprocess needed, plugin auto-starts the server on enable):
-
-```bash
-# Add HTTP MCP server (replace 4123 with your configured port)
-claude mcp add --transport http obsidian-http http://127.0.0.1:4123/mcp
-
-# Or add to project scope for team sharing  
-claude mcp add --transport http obsidian-http --scope project http://127.0.0.1:4123/mcp
-```
-
-
-### Claude Desktop / Other MCP Clients
-Configure a direct HTTP server entry pointing to: `http://127.0.0.1:4123/mcp` (or your configured port). No subprocess or extra wrapper is required.
-
-Notes:
-- Ensure the plugin is enabled first so the server is listening.
-- Restart the client if it cached an older capability response.
-- If you enable auth later, add the Bearer token header in the client’s MCP config.
-
-## CLI client
-A ready-to-run `src/tools/cli-client.js` script is included. You can copy this outside the plugin folder and run it with `node`. Set the environment variable `OBSIDIAN_MCP_PORT` if you've configured a custom port (default is 4123).
-
-## Templater adapter
-The adapter tries `renderTemplate`, `run`, `compile`, and finally falls back to a simple interpolation. If you want full Templater execution inside the vault context (e.g. file-based template commands), we'll add a helper to open a temporary file context and run Templater's file-based render APIs.
-
-## Project Structure
+### Project Structure
 
 ```
 src/
-├── main.ts              # Main plugin entry point
-├── mcp-server.ts        # HTTP MCP server implementation
-├── plugin-bridge.ts     # Bridge between MCP and Obsidian APIs
-├── settings.ts          # Plugin settings and UI
-└── tools/               # Tool adapters and utilities
-    ├── cli-client.js    # Standalone CLI client
-    ├── dataview.ts      # Dataview plugin adapter
-    ├── tasks.ts         # Tasks plugin adapter
-    └── templater.ts     # Templater plugin adapter
-tests/                   # Unit tests
-manifest.json           # Obsidian plugin manifest
-package.json           # Node.js dependencies and build scripts
-tsconfig.json          # TypeScript configuration
+├── main.ts                        # Main plugin entry point
+├── mcp-websocket.ts               # WebSocket transport
+├── plugin-bridge.ts               # Tool registration and routing
+├── settings.ts                    # Plugin settings UI
+└── tools/                         # Tool adapters
+    ├── mcp-http-ws-bridge.js      # Bridge server
+    ├── dataview.ts                # Dataview integration
+    └── tasks.ts                   # Task management
 ```
 
-## Next Steps (Suggested)
-- Add richer Dataview response shaping and pagination
-- Add a Templater adapter that can execute templates in file contexts
-- Add integration tests with a disposable Obsidian environment
-- Add optional SSL/TLS support for enhanced security
-- Implement MCP `resources` & `prompts` capabilities for richer client UI capability display
+## Contributing
+
+Contributions are welcome! Whether it's:
+- 🐛 Bug reports and fixes
+- ✨ Feature requests and implementations
+- 📚 Documentation improvements
+- 🧪 Test coverage enhancements
+
+Please feel free to open issues or submit pull requests.
 
 ## License
 
-This project is licensed under the GNU General Public License v3.0 or later (GPL-3.0-or-later). See the `LICENSE` file for the full text.
+This project is licensed under the GNU General Public License v3.0 or later (GPL-3.0-or-later).
 
-Summary (not a substitute for the license):
-- You may run, study, share, and modify the code.
-- If you distribute modified versions (including over a network if they constitute distribution), they must also be licensed under GPL-3.0-or-later and provide source code.
-- No additional restrictions may be applied that contradict the GPL.
+**Summary:**
+- ✅ Run, study, share, and modify the code freely
+- ✅ Distribute modified versions with source code under GPL-3.0-or-later
+- ❌ Apply additional restrictions that contradict the GPL
 
-If you need a different licensing arrangement (e.g., proprietary embedding without copyleft obligations), you can reach out to discuss dual licensing.
+For alternative licensing arrangements, please reach out to discuss dual licensing options.
+
+## Acknowledgments
+
+Built with:
+- [Obsidian](https://obsidian.md) - The extensible knowledge base
+- [Model Context Protocol](https://modelcontextprotocol.io) - AI integration standard
+- [Dataview](https://github.com/blacksmithgu/obsidian-dataview) - Powerful query engine for Obsidian

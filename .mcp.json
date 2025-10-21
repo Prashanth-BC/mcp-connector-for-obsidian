@@ -1,9 +1,8 @@
 {
   "mcpServers": {
-    "obsidian-mcp-connector": {
-      "type": "http",
-      "url": "http://127.0.0.1:4123",
-      "description": "Access to Obsidian vault notes, search, and plugin data"
+    "obsidian": {
+      "url": "http://127.0.0.1:4125/mcp",
+      "description": "Obsidian vault access via WebSocket bridge. Provides comprehensive vault, task, and dataview management for Obsidian notes.\n\nIMPORTANT: Each MCP tool (mcp__obsidian-mcp-connector__*) has detailed descriptions with specific usage guidelines. ALWAYS read and follow the individual tool descriptions before using any tool - they contain critical information about:\n- Tool-specific parameters and formats\n- Priority order for choosing between tools\n- Dataview metadata format requirements\n- Task creation/editing best practices\n- When to preserve existing metadata\n\nTo discover available tools and their descriptions:\n1. Use mcp__obsidian-mcp-connector__plugins_inspect with no parameters to list all tools\n2. Each tool name indicates its category: vault_*, dataview_*, tasks_*, plugins_*\n3. Tool descriptions include inputSchema with required/optional parameters\n\nOBSIDIAN FILE CONVENTIONS:\n- Use Obsidian-style backlinks: [[filename]]\n- Use internal TOC links: [[#Section Name]]\n- Follow Obsidian file naming (lowercase, hyphens/spaces)\n- Tasks use Dataview inline metadata format: [key:: value]\n\nFor detailed tool-specific guidelines, refer to each tool's description field."
     }
   }
 }
