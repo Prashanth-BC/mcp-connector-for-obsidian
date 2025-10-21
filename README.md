@@ -4,12 +4,24 @@ Connect your Obsidian vault to AI assistants and automation tools through the Mo
 
 ## Why Use This Plugin?
 
-- **AI-Powered Knowledge Management**: Let AI assistants read, search, and manage your notes
-- **Advanced Task Management**: Create, edit, and track tasks with rich metadata using natural language
-- **Dataview Integration**: Execute powerful queries to surface insights from your vault
-- **Cross-Platform**: Works on Windows, macOS, Linux, and Android (self-contained on device)
-- **Privacy-First**: Runs entirely on your local machine - no cloud services required
-- **Auto-Reconnection**: Robust connection handling with automatic recovery
+### 🎯 Intelligent Context, Minimal Tokens
+
+**Precision Over Brute Force**
+- **Surgical Retrieval**: Instead of overwhelming AI with your entire vault, precisely target only the notes that matter
+- **Query-Driven Intelligence**: Harness Dataview's powerful query language to extract exactly what you need—no more, no less
+- **Token Optimization**: Dramatically reduce token consumption by fetching context-relevant content, not your entire knowledge base
+- **Metadata-Powered Filtering**: Leverage tags, dates, priorities, and custom fields to pinpoint information with laser precision
+
+**The Difference**: Rather than dumping 1000+ notes into the AI's context window (exhausting tokens and diluting focus), ask "Show me high-priority project notes from this quarter" and receive only the 10 truly relevant documents. Your AI assistant stays focused, responsive, and cost-effective.
+
+### 🚀 Transformative Benefits
+
+- **AI-Powered Knowledge Orchestration**: Elevate your vault from static storage to an intelligent, queryable knowledge system
+- **Sophisticated Task Mastery**: Craft and manage intricate task hierarchies with rich metadata through natural conversation
+- **Dataview Synergy**: Unlock the full power of structured queries without wrestling with complex syntax
+- **Universal Platform Support**: Seamlessly operate across Windows, macOS, Linux, and Android—even fully self-contained on mobile
+- **Privacy-First Architecture**: Keep your knowledge sacred—everything runs locally with zero cloud dependencies
+- **Battle-Tested Reliability**: Enjoy robust auto-reconnection and graceful error handling for uninterrupted workflow
 
 ## Key Features
 
