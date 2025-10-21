@@ -65,7 +65,21 @@ MCP Client (Claude Code) ←→ Bridge Server ←→ Obsidian Plugin ←→ Your
 
 ## Quick Start
 
-### 1. Install the Plugin
+### Option A: Automated Installation (Recommended)
+
+Use the installation scripts to automatically download, build, and install:
+
+```bash
+# Linux/Mac
+./install.sh /path/to/your/vault
+
+# Windows
+install.bat C:\path\to\your\vault
+```
+
+Then enable the plugin in Obsidian Settings → Community plugins → MCP Connector
+
+### Option B: Manual Installation
 
 ```bash
 # Build the plugin
@@ -78,7 +92,25 @@ cp -r mcp-connector /path/to/vault/.obsidian/plugins/
 
 Enable the plugin in Obsidian Settings → Community plugins → MCP Connector
 
-### 2. Start the Bridge Server
+### 2. Launch the Workspace
+
+**Option A: All-in-One Launcher (Recommended)**
+
+Start both the bridge server and Claude Code in one command:
+
+```bash
+# Linux/Mac (uses tmux)
+cd /path/to/your/vault
+./start-mcp-workspace.sh
+
+# Windows (uses Windows Terminal or separate windows)
+cd C:\path\to\your\vault
+start-mcp-workspace.bat
+```
+
+**Option B: Manual Launch**
+
+Start components separately:
 
 ```bash
 # Linux/Mac
@@ -90,7 +122,7 @@ Enable the plugin in Obsidian Settings → Community plugins → MCP Connector
 # Wait for: [WS Bridge] ✅ Obsidian plugin connected - Bridge is now READY
 ```
 
-### 3. Connect Your MCP Client
+### 3. Connect Your MCP Client (If Not Using Workspace Launcher)
 
 ```bash
 # Claude Code
