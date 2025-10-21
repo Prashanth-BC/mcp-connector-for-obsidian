@@ -6,7 +6,7 @@ REM This script downloads, builds, and installs the plugin to your vault
 
 set "REPO_URL=https://github.com/Prashanth-BC/mcp-connector-for-obsidian/archive/refs/heads/main.zip"
 set "PLUGIN_NAME=mcp-connector"
-set "TEMP_DIR=%TEMP%\%PLUGIN_NAME%-install"
+set "TEMP_DIR=%TEMP%\%PLUGIN_NAME%-install-%RANDOM%-%RANDOM%"
 
 echo =========================================
 echo MCP Connector for Obsidian - Installer
@@ -48,7 +48,8 @@ echo.
 
 REM Get vault path from user
 if "%~1"=="" (
-    set /p "VAULT_PATH=Please enter the full path to your Obsidian vault: "
+    set "VAULT_PATH=%CD%"
+    echo No vault path specified, using current directory as vault
 ) else (
     set "VAULT_PATH=%~1"
 )
@@ -63,13 +64,13 @@ echo.
 
 REM Download and build
 echo Downloading repository...
-if exist "%TEMP_DIR%" rd /s /q "%TEMP_DIR%"
+echo Using temporary directory: %TEMP_DIR%
 mkdir "%TEMP_DIR%"
 
 curl -L "%REPO_URL%" -o "%TEMP_DIR%\repo.zip"
 if %ERRORLEVEL% neq 0 (
     echo Error: Failed to download repository
-    exit /b 1
+    goto :cleanup_and_exit
 )
 
 echo.
@@ -78,17 +79,17 @@ cd /d "%TEMP_DIR%"
 tar -xf repo.zip
 if %ERRORLEVEL% neq 0 (
     echo Error: Failed to extract files
-    exit /b 1
+    goto :cleanup_and_exit
 )
 
 cd mcp-connector-for-obsidian-main
 
 echo.
 echo Installing dependencies...
-call npm ci
+call npm ci --quiet --no-progress
 if %ERRORLEVEL% neq 0 (
     echo Error: Failed to install dependencies
-    exit /b 1
+    goto :cleanup_and_exit
 )
 
 echo.
@@ -96,8 +97,15 @@ echo Building plugin...
 call npm run build
 if %ERRORLEVEL% neq 0 (
     echo Error: Failed to build plugin
-    exit /b 1
+    goto :cleanup_and_exit
 )
+
+echo.
+echo Cleaning up build artifacts...
+REM Remove node_modules from temp directory to save space
+rd /s /q node_modules 2>nul
+REM Remove downloaded zip
+del /q "%TEMP_DIR%\repo.zip" 2>nul
 
 echo [OK] Build completed successfully
 echo.
@@ -117,7 +125,7 @@ if exist "!PLUGIN_DIR!" (
 xcopy /E /I /Y "%TEMP_DIR%\mcp-connector-for-obsidian-main\%PLUGIN_NAME%" "!PLUGIN_DIR!" >nul
 if %ERRORLEVEL% neq 0 (
     echo Error: Failed to copy plugin files
-    exit /b 1
+    goto :cleanup_and_exit
 )
 
 echo [OK] Plugin installed to: !PLUGIN_DIR!
@@ -126,7 +134,7 @@ echo.
 REM Cleanup
 echo Cleaning up temporary files...
 cd /d "%TEMP%"
-rd /s /q "%TEMP_DIR%"
+if exist "%TEMP_DIR%" rd /s /q "%TEMP_DIR%" 2>nul
 echo [OK] Cleanup completed
 echo.
 
@@ -145,3 +153,14 @@ echo https://github.com/Prashanth-BC/mcp-connector-for-obsidian
 echo.
 
 pause
+exit /b 0
+
+:cleanup_and_exit
+REM Cleanup on error
+echo.
+echo Cleaning up after error...
+cd /d "%TEMP%"
+if exist "%TEMP_DIR%" rd /s /q "%TEMP_DIR%" 2>nul
+echo Installation failed. Temporary files cleaned up.
+pause
+exit /b 1

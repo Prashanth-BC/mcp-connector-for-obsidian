@@ -70,10 +70,21 @@ MCP Client (Claude Code) ←→ Bridge Server ←→ Obsidian Plugin ←→ Your
 Use the installation scripts to automatically download, build, and install:
 
 ```bash
-# Linux/Mac
+# Linux/Mac - from your vault directory
+cd /path/to/your/vault
+curl -O https://raw.githubusercontent.com/Prashanth-BC/mcp-connector-for-obsidian/main/install.sh
+chmod +x install.sh
+./install.sh
+
+# Or specify vault path
 ./install.sh /path/to/your/vault
 
-# Windows
+# Windows - from your vault directory
+cd C:\path\to\your\vault
+curl -O https://raw.githubusercontent.com/Prashanth-BC/mcp-connector-for-obsidian/main/install.bat
+install.bat
+
+# Or specify vault path
 install.bat C:\path\to\your\vault
 ```
 

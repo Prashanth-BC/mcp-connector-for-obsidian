@@ -7,7 +7,7 @@ set -e
 
 REPO_URL="https://github.com/Prashanth-BC/mcp-connector-for-obsidian/archive/refs/heads/main.zip"
 PLUGIN_NAME="mcp-connector"
-TEMP_DIR="/tmp/${PLUGIN_NAME}-install"
+TEMP_DIR=$(mktemp -d -t "${PLUGIN_NAME}-install-XXXXXXXX")
 
 echo "========================================="
 echo "MCP Connector for Obsidian - Installer"
@@ -45,14 +45,13 @@ check_dependencies() {
 # Get vault path from user
 get_vault_path() {
     if [ -z "$1" ]; then
-        echo "Please enter the full path to your Obsidian vault:"
-        read -r VAULT_PATH
+        VAULT_PATH="$(pwd)"
+        echo "No vault path specified, using current directory as vault"
     else
         VAULT_PATH="$1"
+        # Expand ~ to home directory
+        VAULT_PATH="${VAULT_PATH/#\~/$HOME}"
     fi
-
-    # Expand ~ to home directory
-    VAULT_PATH="${VAULT_PATH/#\~/$HOME}"
 
     if [ ! -d "$VAULT_PATH" ]; then
         echo "Error: Vault path does not exist: $VAULT_PATH"
@@ -66,8 +65,7 @@ get_vault_path() {
 # Download and build
 build_plugin() {
     echo "Downloading repository..."
-    rm -rf "$TEMP_DIR"
-    mkdir -p "$TEMP_DIR"
+    echo "Using temporary directory: $TEMP_DIR"
 
     if command -v curl &> /dev/null; then
         curl -L "$REPO_URL" -o "${TEMP_DIR}/repo.zip"
@@ -83,11 +81,18 @@ build_plugin() {
 
     echo ""
     echo "Installing dependencies..."
-    npm ci
+    npm ci --quiet --no-progress
 
     echo ""
     echo "Building plugin..."
     npm run build
+
+    echo ""
+    echo "Cleaning up build artifacts..."
+    # Remove node_modules from temp directory to save space
+    rm -rf node_modules
+    # Remove downloaded zip
+    rm -f "${TEMP_DIR}/repo.zip"
 
     echo "✓ Build completed successfully"
     echo ""
@@ -114,11 +119,16 @@ install_to_vault() {
 
 # Cleanup
 cleanup() {
-    echo "Cleaning up temporary files..."
-    rm -rf "$TEMP_DIR"
-    echo "✓ Cleanup completed"
-    echo ""
+    if [ -d "$TEMP_DIR" ]; then
+        echo "Cleaning up temporary files..."
+        rm -rf "$TEMP_DIR"
+        echo "✓ Cleanup completed"
+        echo ""
+    fi
 }
+
+# Trap to ensure cleanup on exit (success or failure)
+trap cleanup EXIT INT TERM
 
 # Main installation flow
 main() {
@@ -126,7 +136,6 @@ main() {
     get_vault_path "$1"
     build_plugin
     install_to_vault
-    cleanup
 
     echo "========================================="
     echo "Installation Complete!"
