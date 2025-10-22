@@ -81,11 +81,11 @@ chmod +x install.sh
 
 # Windows - from your vault directory
 cd C:\path\to\your\vault
-curl -O https://raw.githubusercontent.com/Prashanth-BC/mcp-connector-for-obsidian/main/install.bat
-install.bat
+curl -O https://raw.githubusercontent.com/Prashanth-BC/mcp-connector-for-obsidian/main/install.cmd
+install.cmd
 
 # Or specify vault path
-install.bat C:\path\to\your\vault
+install.cmd C:\path\to\your\vault
 ```
 
 Then enable the plugin in Obsidian Settings → Community plugins → MCP Connector
@@ -114,7 +114,7 @@ cd /path/to/your/vault
 
 # Windows (uses Windows Terminal or separate windows)
 cd C:\path\to\your\vault
-start-mcp-workspace.bat
+start-mcp-workspace.cmd
 ```
 
 The workspace launcher automatically configures Claude Code with the MCP connection. You can now ask your AI assistant to:
