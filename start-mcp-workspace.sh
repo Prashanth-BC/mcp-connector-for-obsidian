@@ -6,7 +6,8 @@
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-BRIDGE_SCRIPT="${SCRIPT_DIR}/.obsidian/plugins/mcp-connector/start-bridge.sh"
+PLUGIN_DIR="${SCRIPT_DIR}/.obsidian/plugins/mcp-connector"
+BRIDGE_SCRIPT="${PLUGIN_DIR}/mcp-http-ws-bridge.js"
 SESSION_NAME="mcp-workspace"
 
 echo "========================================="
@@ -38,6 +39,18 @@ if [ ! -f "$BRIDGE_SCRIPT" ]; then
     exit 1
 fi
 
+# Function to kill existing bridge processes
+kill_existing_bridge() {
+    EXISTING_PIDS=$(pgrep -f "mcp-http-ws-bridge.js")
+    if [ -n "$EXISTING_PIDS" ]; then
+        echo "Found existing bridge process(es), killing: $EXISTING_PIDS"
+        for PID in $EXISTING_PIDS; do
+            kill "$PID" 2>/dev/null
+        done
+        sleep 1
+    fi
+}
+
 # Kill existing session if it exists
 if tmux has-session -t "$SESSION_NAME" 2>/dev/null; then
     echo "Stopping existing workspace session..."
@@ -47,8 +60,11 @@ fi
 echo "Starting MCP Connector workspace..."
 echo ""
 
+# Kill existing bridge processes
+kill_existing_bridge
+
 # Create new tmux session with bridge server
-tmux new-session -d -s "$SESSION_NAME" -n "bridge" "bash -c '$BRIDGE_SCRIPT; echo; echo \"Bridge stopped. Press any key to exit.\"; read'"
+tmux new-session -d -s "$SESSION_NAME" -n "bridge" "bash -c 'cd \"$PLUGIN_DIR\" && node \"$BRIDGE_SCRIPT\"; echo; echo \"Bridge stopped. Press any key to exit.\"; read'"
 
 # Create second window for Claude Code
 tmux new-window -t "$SESSION_NAME" -n "claude" "bash -c 'echo \"Waiting for bridge to start...\"; sleep 3; clear; claude; echo; echo \"Claude Code stopped. Press any key to exit.\"; read'"

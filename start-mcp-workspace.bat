@@ -5,7 +5,8 @@ REM MCP Connector Workspace Launcher
 REM Starts the bridge server and Claude Code in separate terminal tabs
 
 set "SCRIPT_DIR=%~dp0"
-set "BRIDGE_SCRIPT=%SCRIPT_DIR%.obsidian\plugins\mcp-connector\start-bridge.cmd"
+set "PLUGIN_DIR=%SCRIPT_DIR%.obsidian\plugins\mcp-connector"
+set "BRIDGE_SCRIPT=%PLUGIN_DIR%\mcp-http-ws-bridge.js"
 
 echo =========================================
 echo MCP Connector Workspace Launcher
@@ -13,7 +14,7 @@ echo =========================================
 echo.
 
 REM Check for Node.js
-where node >nul 2>nul
+node --version >NUL 2>&1
 if %ERRORLEVEL% neq 0 (
     echo Error: Node.js is not installed.
     echo Please install Node.js from: https://nodejs.org/
@@ -22,7 +23,7 @@ if %ERRORLEVEL% neq 0 (
 )
 
 REM Check for Claude Code
-where claude >nul 2>nul
+claude --version >NUL 2>&1
 if %ERRORLEVEL% neq 0 (
     echo Error: Claude Code CLI is not installed.
     echo Please install Claude Code from: https://claude.ai/code
@@ -46,11 +47,11 @@ echo   2. Claude Code
 echo.
 
 REM Detect Windows Terminal
-where wt >nul 2>nul
+wt --version >NUL 2>&1
 if %ERRORLEVEL% equ 0 (
     echo Using Windows Terminal...
     REM Use Windows Terminal with split panes
-    start "" wt -w 0 new-tab --title "MCP Bridge" cmd /k "echo === MCP Bridge Server === && echo. && cd /d "%SCRIPT_DIR%" && call "%BRIDGE_SCRIPT%"" ; split-pane --title "Claude Code" cmd /k "echo === Claude Code === && echo Waiting for bridge to start... && timeout /t 3 /nobreak >nul && echo. && cd /d "%SCRIPT_DIR%" && claude"
+    start "" wt -w 0 new-tab --title "MCP Bridge" cmd /k "echo === MCP Bridge Server === && echo. && cd /d "%PLUGIN_DIR%" && node "%BRIDGE_SCRIPT%"" ; split-pane --title "Claude Code" cmd /k "echo === Claude Code === && echo Waiting for bridge to start... && timeout /t 3 /NOBREAK && echo. && cd /d "%SCRIPT_DIR%" && claude"
     echo.
     echo [OK] Workspace started in Windows Terminal
     echo.
@@ -66,12 +67,12 @@ if %ERRORLEVEL% equ 0 (
 ) else (
     echo Using standard Command Prompt...
     REM Fallback to standard cmd windows
-    start "MCP Bridge Server" cmd /k "echo === MCP Bridge Server === && echo. && cd /d "%SCRIPT_DIR%" && call "%BRIDGE_SCRIPT%""
+    start "MCP Bridge Server" cmd /k "echo === MCP Bridge Server === && echo. && cd /d "%PLUGIN_DIR%" && node "%BRIDGE_SCRIPT%""
 
     REM Wait a moment before starting Claude
-    timeout /t 2 /nobreak >nul
+    timeout /t 2 /NOBREAK
 
-    start "Claude Code" cmd /k "echo === Claude Code === && echo Waiting for bridge to start... && timeout /t 3 /nobreak >nul && echo. && cd /d "%SCRIPT_DIR%" && claude"
+    start "Claude Code" cmd /k "echo === Claude Code === && echo Waiting for bridge to start... && timeout /t 3 /NOBREAK && echo. && cd /d "%SCRIPT_DIR%" && claude"
 
     echo.
     echo [OK] Workspace started in separate windows

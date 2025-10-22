@@ -115,6 +115,13 @@ install_to_vault() {
 
     echo "✓ Plugin installed to: $PLUGIN_DIR"
     echo ""
+
+    # Copy workspace launcher to vault root
+    echo "Copying workspace launcher to vault..."
+    cp "${TEMP_DIR}/mcp-connector-for-obsidian-main/start-mcp-workspace.sh" "${VAULT_PATH}/start-mcp-workspace.sh"
+    chmod +x "${VAULT_PATH}/start-mcp-workspace.sh"
+    echo "✓ Workspace launcher copied"
+    echo ""
 }
 
 # Cleanup
@@ -144,8 +151,9 @@ main() {
     echo "Next steps:"
     echo "1. Open Obsidian and go to Settings → Community plugins"
     echo "2. Enable 'MCP Connector'"
-    echo "3. Start the bridge server:"
-    echo "   ${PLUGIN_DIR}/start-bridge.sh"
+    echo "3. Launch the workspace:"
+    echo "   cd ${VAULT_PATH}"
+    echo "   ./start-mcp-workspace.sh"
     echo ""
     echo "For more information, visit:"
     echo "https://github.com/Prashanth-BC/mcp-connector-for-obsidian"

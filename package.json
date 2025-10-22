@@ -4,7 +4,7 @@
   "main": "main.js",
   "license": "GPL-3.0-or-later",
   "scripts": {
-    "build": "esbuild src/main.ts --bundle --platform=neutral --outfile=mcp-connector/main.js --external:obsidian --external:http --external:https --external:net --format=cjs && esbuild src/tools/mcp-http-ws-bridge.js --bundle --platform=node --outfile=mcp-connector/mcp-http-ws-bridge.js && node -e \"const fs = require('fs'); fs.copyFileSync('manifest.json', 'mcp-connector/manifest.json'); fs.copyFileSync('src/tools/start-bridge.sh', 'mcp-connector/start-bridge.sh'); fs.copyFileSync('src/tools/start-bridge.cmd', 'mcp-connector/start-bridge.cmd');\"",
+    "build": "esbuild src/main.ts --bundle --platform=neutral --outfile=mcp-connector/main.js --external:obsidian --external:http --external:https --external:net --format=cjs && esbuild src/tools/mcp-http-ws-bridge.js --bundle --platform=node --outfile=mcp-connector/mcp-http-ws-bridge.js && node -e \"const fs = require('fs'); fs.copyFileSync('manifest.json', 'mcp-connector/manifest.json');\"",
     "watch": "esbuild src/main.ts --bundle --platform=neutral --outfile=main.js --external:obsidian --external:http --external:https --external:net --watch",
     "test": "jest",
     "lint": "echo 'Add linter if desired'"

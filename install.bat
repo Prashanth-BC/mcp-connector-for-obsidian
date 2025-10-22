@@ -16,27 +16,27 @@ echo.
 REM Check for required tools
 echo Checking dependencies...
 
-where node >nul 2>nul
+node --version >NUL 2>&1
 if %ERRORLEVEL% neq 0 (
     echo Error: Node.js is not installed. Please install Node.js and try again.
     echo Download from: https://nodejs.org/
     exit /b 1
 )
 
-where npm >nul 2>nul
+npm --version >NUL 2>&1
 if %ERRORLEVEL% neq 0 (
     echo Error: npm is not installed. Please install npm and try again.
     exit /b 1
 )
 
-where curl >nul 2>nul
+curl --version >NUL 2>&1
 if %ERRORLEVEL% neq 0 (
     echo Error: curl is not installed. Please install curl and try again.
     echo Windows 10 1803+ has curl built-in. For older versions, download from: https://curl.se/windows/
     exit /b 1
 )
 
-where tar >nul 2>nul
+tar --version >NUL 2>&1
 if %ERRORLEVEL% neq 0 (
     echo Error: tar is not installed. Please install tar and try again.
     echo Windows 10 has tar built-in. For older versions, install 7-Zip or similar.
@@ -103,9 +103,9 @@ if %ERRORLEVEL% neq 0 (
 echo.
 echo Cleaning up build artifacts...
 REM Remove node_modules from temp directory to save space
-rd /s /q node_modules 2>nul
+if exist node_modules rd /s /q node_modules
 REM Remove downloaded zip
-del /q "%TEMP_DIR%\repo.zip" 2>nul
+if exist "%TEMP_DIR%\repo.zip" del /q "%TEMP_DIR%\repo.zip"
 
 echo [OK] Build completed successfully
 echo.
@@ -119,10 +119,10 @@ if not exist "!VAULT_PATH!\.obsidian\plugins" mkdir "!VAULT_PATH!\.obsidian\plug
 if exist "!PLUGIN_DIR!" (
     echo Warning: Plugin directory already exists. Backing up to !PLUGIN_DIR!.backup
     if exist "!PLUGIN_DIR!.backup" rd /s /q "!PLUGIN_DIR!.backup"
-    move "!PLUGIN_DIR!" "!PLUGIN_DIR!.backup" >nul
+    move "!PLUGIN_DIR!" "!PLUGIN_DIR!.backup"
 )
 
-xcopy /E /I /Y "%TEMP_DIR%\mcp-connector-for-obsidian-main\%PLUGIN_NAME%" "!PLUGIN_DIR!" >nul
+xcopy /E /I /Y /Q "%TEMP_DIR%\mcp-connector-for-obsidian-main\%PLUGIN_NAME%" "!PLUGIN_DIR!"
 if %ERRORLEVEL% neq 0 (
     echo Error: Failed to copy plugin files
     goto :cleanup_and_exit
@@ -131,10 +131,16 @@ if %ERRORLEVEL% neq 0 (
 echo [OK] Plugin installed to: !PLUGIN_DIR!
 echo.
 
+REM Copy workspace launcher to vault root
+echo Copying workspace launcher to vault...
+copy /Y "%TEMP_DIR%\mcp-connector-for-obsidian-main\start-mcp-workspace.bat" "!VAULT_PATH!\start-mcp-workspace.bat"
+echo [OK] Workspace launcher copied
+echo.
+
 REM Cleanup
 echo Cleaning up temporary files...
 cd /d "%TEMP%"
-if exist "%TEMP_DIR%" rd /s /q "%TEMP_DIR%" 2>nul
+if exist "%TEMP_DIR%" rd /s /q "%TEMP_DIR%"
 echo [OK] Cleanup completed
 echo.
 
@@ -145,8 +151,9 @@ echo.
 echo Next steps:
 echo 1. Open Obsidian and go to Settings -^> Community plugins
 echo 2. Enable 'MCP Connector'
-echo 3. Start the bridge server:
-echo    !PLUGIN_DIR!\start-bridge.cmd
+echo 3. Launch the workspace:
+echo    cd /d "!VAULT_PATH!"
+echo    start-mcp-workspace.bat
 echo.
 echo For more information, visit:
 echo https://github.com/Prashanth-BC/mcp-connector-for-obsidian
@@ -160,7 +167,7 @@ REM Cleanup on error
 echo.
 echo Cleaning up after error...
 cd /d "%TEMP%"
-if exist "%TEMP_DIR%" rd /s /q "%TEMP_DIR%" 2>nul
+if exist "%TEMP_DIR%" rd /s /q "%TEMP_DIR%"
 echo Installation failed. Temporary files cleaned up.
 pause
 exit /b 1

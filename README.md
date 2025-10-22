@@ -105,8 +105,6 @@ Enable the plugin in Obsidian Settings → Community plugins → MCP Connector
 
 ### 2. Launch the Workspace
 
-**Option A: All-in-One Launcher (Recommended)**
-
 Start both the bridge server and Claude Code in one command:
 
 ```bash
@@ -119,39 +117,7 @@ cd C:\path\to\your\vault
 start-mcp-workspace.bat
 ```
 
-**Option B: Manual Launch**
-
-Start components separately:
-
-```bash
-# Linux/Mac
-.obsidian/plugins/mcp-connector/start-bridge.sh
-
-# Windows
-.obsidian\plugins\mcp-connector\start-bridge.cmd
-
-# Wait for: [WS Bridge] ✅ Obsidian plugin connected - Bridge is now READY
-```
-
-### 3. Connect Your MCP Client (If Not Using Workspace Launcher)
-
-```bash
-# Claude Code
-claude mcp add --transport http obsidian http://127.0.0.1:4125/mcp
-
-# Or configure in .mcp.json
-{
-  "mcpServers": {
-    "obsidian": {
-      "url": "http://127.0.0.1:4125/mcp"
-    }
-  }
-}
-```
-
-### 4. Start Using It!
-
-Ask your AI assistant to:
+The workspace launcher automatically configures Claude Code with the MCP connection. You can now ask your AI assistant to:
 - "List all my tasks with high priority"
 - "Search my notes for references to machine learning"
 - "Create a task to review the project plan by Friday"
